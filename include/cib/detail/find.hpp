@@ -10,6 +10,16 @@
 
 
 namespace cib::detail {
+#ifdef __circle_lang__
+
+    template<typename Tag, typename MetaFunc, typename Set>
+    constexpr auto const & find(Set const & t) requires (Set.template == ordered_set){
+        constexpr int I = (typename MetaFunc::template invoke<Set.type_args>).find(Tag);
+        static_assert(-1 != I);
+        return t.[I];
+    }
+
+#else
     struct typename_map_entry {
         std::string_view name;
         unsigned int index;
@@ -120,8 +130,7 @@ namespace cib::detail {
 
         return t.template get<index>();
     }
-
-
+#endif
 
 }
 

@@ -10,6 +10,63 @@
 
 
 namespace cib::detail {
+#ifdef __circle_lang__
+    template<typename... Ts>
+    struct ordered_set {       
+        // All parameters must be unique.
+        static_assert(sizeof...(Ts.unique) == sizeof...(Ts));
+
+        constexpr ordered_set(Ts... values) : m(values)... { }
+
+        template<int Index>
+        constexpr const Ts...[Index]& get() const {
+            return m...[Index];
+        }
+
+        template<typename T>
+        constexpr T const & get() const {
+            static constexpr int index = Ts.find(T);
+            static_assert(-1 != index);
+            return m...[index];
+        }
+
+        constexpr static auto size() {
+            return sizeof...(Ts);
+        }
+
+        constexpr bool operator==(ordered_set<Ts...> const & rhs) const {
+            return (... && (m == rhs.m));
+        }
+
+        template<typename... RhsTn>
+        constexpr bool operator==(ordered_set<RhsTn...>) const noexcept {
+            return false;
+        }
+
+        template<typename... RhsTn>
+        constexpr bool operator!=(ordered_set<RhsTn...> const & rhs) const {
+            return !(*this == rhs);
+        }
+
+        Ts ...m;
+    };
+
+
+    template<typename Callable, typename... Values>
+    constexpr auto apply(Callable operation, ordered_set<Values...> const & t) {
+        return operation(t.[:]...);
+    }
+
+
+    template<typename... Tuples>
+    constexpr ordered_set<
+        for typename Tuple : Tuples => Tuple.type_args...
+    > 
+    make_tuple(Tuples&&... tuples forward) {
+        return { for tup : tuples => tup... };
+    }
+
+#else
     template<typename T>
     struct tuple_element {
         T value;
@@ -92,6 +149,7 @@ namespace cib::detail {
         constexpr auto total_num_elements = (tuples.size() + ...);
         return tuple_cat_impl(std::make_integer_sequence<int, total_num_elements>{}, tuples...);
     }
+#endif
 }
 
 namespace std {
