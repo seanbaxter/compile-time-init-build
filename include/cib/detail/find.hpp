@@ -25,7 +25,10 @@ namespace cib::detail {
 
     template<typename Tag>
     constexpr static std::string_view name() {
-        #if defined(__clang__)
+        #if defined(__circle_lang)
+            return Tag.string;
+
+        #elif defined(__clang__)
             constexpr std::string_view function_name = __PRETTY_FUNCTION__;
             constexpr auto lhs = 44;
             constexpr auto rhs = function_name.size() - 2;
@@ -124,3 +127,4 @@ namespace cib::detail {
 
 
 #endif //COMPILE_TIME_INIT_BUILD_FIND_HPP
+

@@ -53,7 +53,7 @@ namespace cib::detail {
 
     template<typename Callable, typename... Values>
     constexpr auto apply(Callable operation, ordered_set<Values...> const & t) {
-        return operation(t.tuple_element<Values>::value...);
+        return operation(t.template tuple_element<Values>::value...);
     }
 
     struct index_pair {

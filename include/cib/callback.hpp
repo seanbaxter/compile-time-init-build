@@ -58,7 +58,7 @@ namespace cib {
             CIB_CONSTEXPR auto num_funcs = std::integral_constant<int, NumFuncs>{};
 
             detail::for_each(num_funcs, [&](auto i){
-                CIB_CONSTEXPR auto func = handler_builder.funcs[i];
+                  auto func = handler_builder.funcs[i];
                 func(args...);
             });
         }
